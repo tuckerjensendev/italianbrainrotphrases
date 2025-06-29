@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Italian Brainrot for Kids</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(45deg, #fffbe7, #fceabb);
+      font-family: Comic Sans MS, cursive;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin: 20px 20px 0;
+      font-size: 2.5rem;
+      color: #d10a1f;
+    }
+    input[type="text"] {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #d10a1f;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 400px;
+    }
+    .soundboard {
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+    .button {
+      font-size: 0.9rem;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background-color: #f54242;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s;
+      white-space: nowrap;
+    }
+    .button:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Italian Brainrot for Kids 🇮🇹</h1>
+  <input type="text" id="search" placeholder="Search brainrot..."/>
+
+  <div class="soundboard" id="soundboard"></div>
+
+  <script>
+    const phrases = [
+      "Tralalero Tralala", "Bombardiro Crocodilo", "Tung Tung Tung Tung Tung Tung Tung Tung Tung Sahur",
+      "Lirilì Larilà", "Boneca Ambalabu", "Brr Brr Patapim", "Chimpanzini Bananini", "Bombombini Gusini",
+      "Capuccino Assassino", "Trippi Troppi", "Frigo Camelo", "La Vaca Saturno Saturnita", "Ballerina Cappucina",
+      "U Din Din Din Din Dun Ma Din Din Din Dun", "Trulimero Trulicina", "Girafa Celeste", "Bobrito Bandito",
+      "Ta Ta Ta Ta Ta Ta Ta Ta Ta Ta Ta Sahur", "Pot Hotspot", "Frulli Frulla", "Brri Brri Bicus Dicus Bombicus",
+      "Tric Trac Baraboom", "Burbaloni Lulilolli", "Orangutini Ananasini",
+      "Garamararamararaman dan Madudungdung tak tuntung perkuntung", "Il Cacto Hipopotamo", "Blueberrinni Octopussini",
+      "Glorbo Fruttodrillo", "Rhino Toasterino", "Zibra Zubra Zibralini", "Graipussi Medussi",
+      "Tigrrullini Watermellini", "Tracotucotulu Delapeladustuz", "Gorillo Watermellondrillo", "Bananita Dolfinita",
+      "Cocofanto Elefanto", "Tigrulli grapefrutunni", "Ballerino Lololo", "Crocodildo Penisini", "Makakini Bananini",
+      "Matteooooooooooooo", "Špijuniro Golubiro", "Elephantuchi Bananuchi", "Crocodillo Ananasinno",
+      "Penguino Cocosino", "Bobrelli Bananelli", "Bulliccinni Bananini", "Pandaccini Bananini",
+      "Torrtuginni Dragonfrutinni", "Gorillini Bananini", "Ecco Cavallo Virtuoso", "Flamingulli-gulli-gulli",
+      "Capybarelli Bananalelli", "Tob Tobi Tob Tob Tobi Tob", "Sigma Boy", "La Esok Sekolah", "Chai Maestro",
+      "Orcalero Orcala", "Nuclearo Dinossauro", "Anpali Babbel", "Brr Es Teh Patipum", "Brr Brr Gangster Gusini",
+      "Trilalero tramalima", "PiPi Kiwi", "Leonelli Cactuselli", "Triki trakatelas", "Kudanile Astronote",
+      "Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Ti Sahur", "pipi potato", "Trenostruzzo Turbo 3000",
+      "Kiwitto Banditto", "Pipi Strawberry",
+      "Trippa Troppa Tralala Lirilì Rilà Tung Tung Sahur Boneca Tung Tung Tralalelo Trippi Troppa Crocodina",
+      "Tung Tung Tung Tung Tung Tung Tung Tung Tung Assassino Boneca",
+      "La vaca Trippa troppa Bombombini Gusini Tralala Lirilira Tung Tung Sahur boneka Tung Tung tralalelo cappuccino assasine Trippi troppa Crocodina fruli frulia",
+      "Svinino Bombondino", "Bulbito Bandito Traktorito", "Raccooni Watermelunni", "Ganganzelli Trulala",
+      "Espressona Signora", "Spaghetti Tualetti", "Cocossini Mama", "Snooffi Zeffirulli", "Perochello Lemonchello",
+      "Tukanno Bananno", "Ananitto Giraffini", "Cocosino Rhino", "Tralaleritos", "Cacasito Satelito",
+      "Armodillo Cocodillo", "Peachi Foxilini", "Ananasita Owlita", "Blueberrini Tatticini", "Quivioli Ameleonni",
+      "Mangolini Parrocini", "Crabito Cocosito", "Don Don Don Satur", "Bombombona Pecorona",
+      "Suricatelli Bananelli", "Penguinelli Cactussini", "Burballoni Watermeloni", "Tirilikalika Tirilikalako",
+      "Cannelloni dragoni", "brindolero brindolina", "pippi poppa pippo peppe", "Robertoooooo",
+      "Tim Cheese"
+    ];
+
+    const board = document.getElementById('soundboard');
+    const search = document.getElementById('search');
+
+    let italianVoice = null;
+
+    // Wait for voices to load
+    speechSynthesis.onvoiceschanged = () => {
+      const voices = speechSynthesis.getVoices();
+      italianVoice = voices.find(v => v.lang.startsWith("it") || v.name.toLowerCase().includes("italian"));
+    };
+
+    function renderButtons(filter = "") {
+      board.innerHTML = "";
+      phrases
+        .filter(p => p.toLowerCase().includes(filter.toLowerCase()))
+        .forEach(phrase => {
+          const btn = document.createElement('button');
+          btn.className = 'button';
+          btn.textContent = phrase;
+          btn.onclick = () => speak(phrase);
+          board.appendChild(btn);
+        });
+    }
+
+    function speak(text) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.9;
+      u.pitch = 1;
+      u.lang = 'it-IT';
+      if (italianVoice) u.voice = italianVoice;
+      speechSynthesis.speak(u);
+    }
+
+    search.addEventListener("input", e => {
+      renderButtons(e.target.value);
+    });
+
+    renderButtons(); // Initial load
+  </script>
+</body>
+</html>
